@@ -18,4 +18,24 @@ export class ProductControllers {
 
     return res.status(200).json(response);
   }
+
+  update(req: Request, res: Response): Response<IProduct> {
+    const productServices = new ProductServices();
+
+    const id = req.params.id;
+
+    const response = productServices.update(req.body, Number(id));
+
+    return res.status(200).json(response);
+  }
+
+  delete(req: Request, res: Response): Response<void> {
+    const productServices = new ProductServices();
+
+    const id = req.params.id;
+
+    productServices.update(req.body, Number(id));
+
+    return res.status(204).json();
+  }
 }

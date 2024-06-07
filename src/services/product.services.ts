@@ -1,5 +1,9 @@
 import { generateId, productDatabase } from "../database/database";
-import { IProduct, TCreateProductBody } from "../interfaces/product.interfaces";
+import {
+  IProduct,
+  TCreateProductBody,
+  TUpdateProductBody,
+} from "../interfaces/product.interfaces";
 
 export class ProductServices {
   create(body: TCreateProductBody): IProduct {
@@ -12,5 +16,29 @@ export class ProductServices {
 
   getMany(): IProduct[] {
     return productDatabase;
+  }
+
+  update(body: TUpdateProductBody, updatingId: number): IProduct {
+    const product = productDatabase.find(
+      (product) => product.id === updatingId
+    ) as IProduct;
+
+    const index = productDatabase.findIndex(
+      (product) => product.id === updatingId
+    );
+
+    const updatedProduct = { ...product, ...body };
+
+    productDatabase.splice(index, 1, updatedProduct);
+
+    return updatedProduct;
+  }
+
+  delete(removingId: Number): void {
+    const index = productDatabase.findIndex(
+      (product) => product.id === removingId
+    );
+
+    productDatabase.splice(index, 1);
   }
 }
