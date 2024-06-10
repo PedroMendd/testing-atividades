@@ -1,4 +1,4 @@
-import { generateId, productDatabase } from "../database/database";
+import { prisma } from "../database/prisma";
 import {
   IProduct,
   TCreateProductBody,
@@ -6,39 +6,31 @@ import {
 } from "../interfaces/product.interfaces";
 
 export class ProductServices {
-  create(body: TCreateProductBody): IProduct {
-    const newProduct = { id: generateId(), ...body };
-
-    productDatabase.push(newProduct);
+  async create(body: TCreateProductBody): Promise<IProduct> {
+    const newProduct = await prisma.product.create({ data: body });
 
     return newProduct;
   }
 
-  getMany(): IProduct[] {
-    return productDatabase;
+  async getMany(): Promise<IProduct[]> {
+    const productList = await prisma.product.findMany();
+
+    return productList;
   }
 
-  update(body: TUpdateProductBody, updatingId: number): IProduct {
-    const product = productDatabase.find(
-      (product) => product.id === updatingId
-    ) as IProduct;
+  async update(
+    body: TUpdateProductBody,
+    updatingId: string
+  ): Promise<IProduct> {
+    const updateProduct = await prisma.product.update({
+      data: body,
+      where: { id: updatingId },
+    });
 
-    const index = productDatabase.findIndex(
-      (product) => product.id === updatingId
-    );
-
-    const updatedProduct = { ...product, ...body };
-
-    productDatabase.splice(index, 1, updatedProduct);
-
-    return updatedProduct;
+    return updateProduct;
   }
 
-  delete(removingId: Number): void {
-    const index = productDatabase.findIndex(
-      (product) => product.id === removingId
-    );
-
-    productDatabase.splice(index, 1);
+  async delete(removingId: string): Promise<void> {
+    await prisma.product.delete({ where: { id: removingId } });
   }
 }

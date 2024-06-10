@@ -1,11 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { productDatabase } from "../database/database";
+import { prisma } from "../database/prisma";
 
 export class isProductIdValid {
-  static execute(req: Request, res: Response, next: NextFunction) {
+  static async execute(req: Request, res: Response, next: NextFunction) {
     const id = req.params.id;
 
-    if (!productDatabase.some((product) => product.id === Number(id))) {
+    const product = await prisma.product.findFirst({ where: { id } });
+
+    if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
 
